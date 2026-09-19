@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drinkmate</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #09090d;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.app {
+  max-width: 520px;
+  min-height: 100vh;
+  margin: auto;
+  padding-bottom: 90px;
+}
+
+header {
+  padding: 25px 20px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.logo span {
+  color: #ff6848;
+}
+
+.status {
+  margin: 10px 18px 20px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #16161d;
+  border: 1px solid #292932;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status small {
+  display: block;
+  color: #9999a5;
+  margin-top: 4px;
+}
+
+.switch {
+  width: 50px;
+  height: 29px;
+  padding: 3px;
+  background: #393943;
+  border-radius: 20px;
+}
+
+.switch i {
+  display: block;
+  width: 23px;
+  height: 23px;
+  background: white;
+  border-radius: 50%;
+  transition: .2s;
+}
+
+.switch.on {
+  background: #ff6848;
+}
+
+.switch.on i {
+  transform: translateX(21px);
+}
+
+h1 {
+  margin: 25px 18px 6px;
+  font-size: 30px;
+  line-height: 1.05;
+}
+
+.subtitle {
+  margin: 0 18px 20px;
+  color: #9999a5;
+}
+
+.card {
+  margin: 0 18px;
+  overflow: hidden;
+  border-radius: 25px;
+  background: #17171f;
+  border: 1px solid #292932;
+}
+
+.avatar {
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 85px;
+  background: linear-gradient(135deg, #39394a, #16161d);
+}
+
+.info {
+  padding: 20px;
+}
+
+.name {
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.meta {
+  margin-top: 5px;
+  color: #a0a0ac;
+}
+
+.tags {
+  margin-top: 14px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 7px 10px;
+  margin: 3px;
+  border-radius: 20px;
+  background: #272730;
+  color: #ddd;
+  font-size: 13px;
+}
+
+.bio {
+  color: #c6c6cf;
+  line-height: 1.45;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+button {
+  font-family: inherit;
+}
+
+.action {
+  flex: 1;
+  border: 0;
+  border-radius: 16px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.no {
+  background: #292931;
+  color: white;
+}
+
+.yes {
+  background: #ff6848;
+  color: white;
+}
+
+.empty {
+  margin: 20px 18px;
+  padding: 35px 20px;
+  text-align: center;
+  border: 1px dashed #393943;
+  border-radius: 20px;
+  color: #999;
+}
+
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, 100%);
+  padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(12,12,17,.96);
+  border-top: 1px solid #282832;
+  display: flex;
+  justify-content: space-around;
+}
+
+nav button {
+  border: 0;
+  background: none;
+  color: #92929d;
+  font-size: 12px;
+}
+
+nav button.active {
+  color: white;
+}
+
+nav b {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 3px;
+}
+
+.toast {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 100px;
+  transform: translateX(-50%);
+  padding: 13px 17px;
+  background: white;
+  color: #111;
+  border-radius: 14px;
+  font-weight: 700;
+  z-index: 10;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="logo">drink<span>mate</span></div>
+  <div>🍻</div>
+</header>
+
+<div class="status">
+  <div>
+    <strong>Jestem dostępny</strong>
+    <small>Pokaż innym, że szukasz ekipy</small>
+  </div>
+
+  <div class="switch" id="switch" onclick="toggleStatus()">
+    <i></i>
+  </div>
+</div>
+
+<h1>Ludzie, którzy<br>szukają ekipy</h1>
+
+<p class="subtitle">
+  Poznaj kogoś na drinka, piwo albo wspólne wyjście.
+</p>
+
+<div id="card"></div>
+
+<nav>
+  <button class="active">
+    <b>⌂</b>
+    Odkrywaj
+  </button>
+
+  <button onclick="showToast('❤️ Tutaj będą Twoje matche')">
+    <b>♥</b>
+    Match
+  </button>
+
+  <button onclick="showToast('👤 Profil będzie dostępny wkrótce')">
+    <b>●</b>
+    Profil
+  </button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+</div>
+
+<script>
+
+const people = [
+
+  {
+    name: "Kuba",
+    age: 22,
+    city: "Warszawa",
+    emoji: "🍺",
+    tags: ["piwo", "pub", "dzisiaj"],
+    bio: "Szukam ludzi na spontaniczne wyjście. Bez spiny, dobra muzyka i dużo śmiechu."
+  },
+
+  {
+    name: "Michał",
+    age: 21,
+    city: "Warszawa",
+    emoji: "🍹",
+    tags: ["drinki", "klub", "wieczorem"],
+    bio: "Chętnie wyskoczę na drinka albo potańczyć. Im większa ekipa, tym lepiej."
+  },
+
+  {
+    name: "Olek",
+    age: 23,
+    city: "Łomianki",
+    emoji: "🥃",
+    tags: ["whisky", "chill", "weekend"],
+    bio: "Weekendowo szukam ekipy do baru albo domówki."
+  }
+
+];
+
+let current = 0;
+
+function render() {
+
+  const card = document.getElementById("card");
+
+  if (current >= people.length) {
+
+    card.innerHTML = `
+      <div class="empty">
+        🍻 To na razie wszyscy w pobliżu.
+        <br><br>
+        Wróć później i sprawdź ponownie.
+      </div>
+    `;
+
+    return;
+  }
+
+  const person = people[current];
+
+  card.innerHTML = `
+    <article class="card">
+
+      <div class="avatar">
+        ${person.emoji}
+      </div>
+
+      <div class="info">
+
+        <div class="name">
+          ${person.name}, ${person.age}
+        </div>
+
+        <div class="meta">
+          📍 ${person.city}
+        </div>
+
+        <div class="tags">
+          ${person.tags.map(tag =>
+            `<span class="tag">#${tag}</span>`
+          ).join("")}
+        </div>
+
+        <p class="bio">
+          ${person.bio}
+        </p>
+
+        <div class="actions">
+
+          <button class="action no" onclick="nextPerson()">
+            ✕ Nie
+          </button>
+
+          <button class="action yes" onclick="likePerson()">
+            ♥ Chcę iść
+          </button>
+
+        </div>
+
+      </div>
+
+    </article>
+  `;
+}
+
+function nextPerson() {
+  current++;
+  render();
+}
+
+function likePerson() {
+
+  showToast("💥 Match! Możecie zacząć rozmowę");
+
+  current++;
+
+  setTimeout(render, 600);
+}
+
+function toggleStatus() {
+
+  document
+    .getElementById("switch")
+    .classList.toggle("on");
+
+  showToast("Status został zmieniony");
+}
+
+function showToast(message) {
+
+  const toast = document.getElementById("toast");
+
+  toast.innerText = message;
+  toast.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, 1800);
+}
+
+render();
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://fdgjuysebhprtitrjnyn.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ICi264_y6iv9oH4LbBCjUQ_v-fE-brs";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  console.log("Drinkmate: Supabase połączony");
+</script>
+  <div id="authPanel" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#09090d;
+  padding:30px 22px;
+  overflow:auto;
+">
+  <div style="max-width:500px;margin:40px auto;">
+    <h1 style="font-size:42px;margin-bottom:8px;">
+      drink<span style="color:#ff5b3d;">mate</span>
+    </h1>
+
+    <p style="color:#999;font-size:18px;margin-bottom:30px;">
+      Zaloguj się albo załóż konto
+    </p>
+
+    <input
+      id="authEmail"
+      type="email"
+      placeholder="E-mail"
+      style="
+        width:100%;
+        padding:16px;
+        margin-bottom:12px;
+        border-radius:14px;
+        border:1px solid #333;
+        background:#17171f;
+        color:white;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="authPassword"
+      type="password"
+      placeholder="Hasło"
+      style="
+        width:100%;
+        padding:16px;
+        margin-bottom:16px;
+        border-radius:14px;
+        border:1px solid #333;
+        background:#17171f;
+        color:white;
+        font-size:16px;
+      "
+    >
+
+    <button
+      onclick="registerDrinkmate()"
+      style="
+        width:100%;
+        padding:17px;
+        border:0;
+        border-radius:14px;
+        background:#ff5b3d;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+        margin-bottom:10px;
+      "
+    >
+      Załóż konto
+    </button>
+
+    <button
+      onclick="loginDrinkmate()"
+      style="
+        width:100%;
+        padding:17px;
+        border:1px solid #444;
+        border-radius:14px;
+        background:#17171f;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+      "
+    >
+      Zaloguj się
+    </button>
+
+    <p id="authMessage" style="
+      margin-top:20px;
+      color:#aaa;
+      text-align:center;
+      line-height:1.5;
+    "></p>
+  </div>
+</div>
+
+<script>
+async function registerDrinkmate() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  if (!email || !password) {
+    document.getElementById("authMessage").innerText =
+      "Wpisz e-mail i hasło.";
+    return;
+  }
+
+  if (password.length < 6) {
+    document.getElementById("authMessage").innerText =
+      "Hasło musi mieć minimum 6 znaków.";
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    document.getElementById("authMessage").innerText =
+      "Błąd: " + error.message;
+    return;
+  }
+
+  document.getElementById("authMessage").innerText =
+    "Konto zostało utworzone 🎉";
+
+  console.log("Nowy użytkownik:", data.user);
+}
+
+async function loginDrinkmate() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    document.getElementById("authMessage").innerText =
+      "Błąd logowania: " + error.message;
+    return;
+  }
+
+  document.getElementById("authMessage").innerText =
+    "Zalogowano 🎉";
+
+  console.log("Zalogowany użytkownik:", data.user);
+}
+</script>
+  <button
+  onclick="document.getElementById('authPanel').style.display='block'"
+  style="
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:9998;
+    padding:12px 18px;
+    border:0;
+    border-radius:12px;
+    background:#ff5b3d;
+    color:white;
+    font-weight:700;
+    font-size:15px;
+  "
+>
+  Zaloguj się
+</button>
+<div id="profilePanel" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9997;
+  background:#09090d;
+  padding:30px 22px;
+  overflow:auto;
+">
+  <div style="max-width:500px;margin:40px auto;">
+
+    <h1 style="font-size:36px;margin-bottom:8px;">
+      Twój profil
+    </h1>
+
+    <p style="color:#999;font-size:17px;margin-bottom:30px;">
+      Uzupełnij podstawowe informacje.
+    </p>
+
+    <label style="display:block;color:#aaa;margin-bottom:8px;">
+      Nick
+    </label>
+
+    <input
+      id="profileUsername"
+      type="text"
+      placeholder="np. Kuba"
+      maxlength="30"
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:16px;
+        margin-bottom:18px;
+        border-radius:14px;
+        border:1px solid #333;
+        background:#17171f;
+        color:white;
+        font-size:16px;
+      "
+    >
+
+    <button
+      onclick="saveDrinkmateProfile()"
+      style="
+        width:100%;
+        padding:17px;
+        border:0;
+        border-radius:14px;
+        background:#ff5b3d;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+      "
+    >
+      Zapisz profil
+    </button>
+
+    <button
+      onclick="closeProfilePanel()"
+      style="
+        width:100%;
+        padding:17px;
+        margin-top:10px;
+        border:1px solid #444;
+        border-radius:14px;
+        background:#17171f;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+      "
+    >
+      Zamknij
+    </button>
+
+    <p id="profileMessage" style="
+      margin-top:20px;
+      color:#aaa;
+      text-align:center;
+      line-height:1.5;
+    "></p>
+
+  </div>
+</div>
+
+<button
+  onclick="openProfilePanel()"
+  style="
+    position:fixed;
+    top:20px;
+    left:20px;
+    z-index:9998;
+    padding:12px 18px;
+    border:0;
+    border-radius:12px;
+    background:#ff5b3d;
+    color:white;
+    font-weight:700;
+    font-size:15px;
+  "
+>
+  Profil
+</button>
+
+<script>
+async function openProfilePanel() {
+  const { data, error } = await supabaseClient.auth.getUser();
+
+  if (error || !data.user) {
+    alert("Najpierw się zaloguj.");
+    return;
+  }
+
+  document.getElementById("profilePanel").style.display = "block";
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("username")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  if (profile && profile.username) {
+    document.getElementById("profileUsername").value =
+      profile.username;
+  }
+}
+
+function closeProfilePanel() {
+  document.getElementById("profilePanel").style.display = "none";
+}
+
+async function saveDrinkmateProfile() {
+  const username =
+    document.getElementById("profileUsername").value.trim();
+
+  const message =
+    document.getElementById("profileMessage");
+
+  if (!username) {
+    message.innerText = "Wpisz nick.";
+    return;
+  }
+
+  const { data: userData, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !userData.user) {
+    message.innerText = "Musisz być zalogowany.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .upsert({
+      id: userData.user.id,
+      username: username
+    });
+
+  if (error) {
+    message.innerText =
+      "Błąd: " + error.message;
+    return;
+  }
+
+  message.innerText =
+    "Profil zapisany 🎉";
+}
+async function updateAuthUI() {
+  const { data } = await supabaseClient.auth.getSession();
+
+  const loginButton = document.querySelector(
+    'button[onclick*="authPanel"]'
+  );
+
+  if (!loginButton) return;
+
+  if (data.session) {
+    loginButton.innerText = "Moje konto";
+  } else {
+    loginButton.innerText = "Zaloguj się";
+  }
+}
+
+updateAuthUI();
+
+</script>
+</body>
+</html>
