@@ -593,5 +593,172 @@ async function loginDrinkmate() {
 >
   Zaloguj się
 </button>
+<div id="profilePanel" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9997;
+  background:#09090d;
+  padding:30px 22px;
+  overflow:auto;
+">
+  <div style="max-width:500px;margin:40px auto;">
+
+    <h1 style="font-size:36px;margin-bottom:8px;">
+      Twój profil
+    </h1>
+
+    <p style="color:#999;font-size:17px;margin-bottom:30px;">
+      Uzupełnij podstawowe informacje.
+    </p>
+
+    <label style="display:block;color:#aaa;margin-bottom:8px;">
+      Nick
+    </label>
+
+    <input
+      id="profileUsername"
+      type="text"
+      placeholder="np. Kuba"
+      maxlength="30"
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:16px;
+        margin-bottom:18px;
+        border-radius:14px;
+        border:1px solid #333;
+        background:#17171f;
+        color:white;
+        font-size:16px;
+      "
+    >
+
+    <button
+      onclick="saveDrinkmateProfile()"
+      style="
+        width:100%;
+        padding:17px;
+        border:0;
+        border-radius:14px;
+        background:#ff5b3d;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+      "
+    >
+      Zapisz profil
+    </button>
+
+    <button
+      onclick="closeProfilePanel()"
+      style="
+        width:100%;
+        padding:17px;
+        margin-top:10px;
+        border:1px solid #444;
+        border-radius:14px;
+        background:#17171f;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+      "
+    >
+      Zamknij
+    </button>
+
+    <p id="profileMessage" style="
+      margin-top:20px;
+      color:#aaa;
+      text-align:center;
+      line-height:1.5;
+    "></p>
+
+  </div>
+</div>
+
+<button
+  onclick="openProfilePanel()"
+  style="
+    position:fixed;
+    top:20px;
+    left:20px;
+    z-index:9998;
+    padding:12px 18px;
+    border:0;
+    border-radius:12px;
+    background:#ff5b3d;
+    color:white;
+    font-weight:700;
+    font-size:15px;
+  "
+>
+  Profil
+</button>
+
+<script>
+async function openProfilePanel() {
+  const { data, error } = await supabaseClient.auth.getUser();
+
+  if (error || !data.user) {
+    alert("Najpierw się zaloguj.");
+    return;
+  }
+
+  document.getElementById("profilePanel").style.display = "block";
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("username")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  if (profile && profile.username) {
+    document.getElementById("profileUsername").value =
+      profile.username;
+  }
+}
+
+function closeProfilePanel() {
+  document.getElementById("profilePanel").style.display = "none";
+}
+
+async function saveDrinkmateProfile() {
+  const username =
+    document.getElementById("profileUsername").value.trim();
+
+  const message =
+    document.getElementById("profileMessage");
+
+  if (!username) {
+    message.innerText = "Wpisz nick.";
+    return;
+  }
+
+  const { data: userData, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !userData.user) {
+    message.innerText = "Musisz być zalogowany.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .upsert({
+      id: userData.user.id,
+      username: username
+    });
+
+  if (error) {
+    message.innerText =
+      "Błąd: " + error.message;
+    return;
+  }
+
+  message.innerText =
+    "Profil zapisany 🎉";
+}
+</script>
 </body>
 </html>
