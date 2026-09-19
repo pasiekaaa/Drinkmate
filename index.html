@@ -1494,38 +1494,30 @@ function closeProfilePanel() {
 async function toggleAvailability() {
 
   if (!currentUser) {
-
     openAuthPanel();
-
     return;
-
   }
 
+  if (!currentProfile || !currentProfile.username) {
+    showToast("Najpierw uzupełnij profil.");
+    openProfilePanel();
+    return;
+  }
 
-  const newValue =
-    !(
-      currentProfile &&
-      currentProfile.available
-    );
-
+  const newValue = !currentProfile.available;
 
   const { data, error } =
     await supabaseClient
       .from("profiles")
-      .upsert(
-        {
-          id: currentUser.id,
-          available: newValue
-        },
-        {
-          onConflict: "id"
-        }
-      )
+      .update({
+        available: newValue
+      })
+      .eq("id", currentUser.id)
       .select()
       .single();
 
-
   if (error) {
+    console.error(error);
 
     showToast(
       "Błąd: " +
@@ -1533,25 +1525,19 @@ async function toggleAvailability() {
     );
 
     return;
-
   }
 
-
-  currentProfile =
-    data;
-
+  currentProfile = data;
 
   updateAvailabilityUI();
 
   await loadPeople();
-
 
   showToast(
     newValue
       ? "Jesteś dostępny 🟢"
       : "Nie jesteś już dostępny"
   );
-
 }
 
 
