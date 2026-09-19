@@ -759,6 +759,23 @@ async function saveDrinkmateProfile() {
   message.innerText =
     "Profil zapisany 🎉";
 }
+async function updateAuthUI() {
+  const { data } = await supabaseClient.auth.getSession();
+
+  const loginButton = document.querySelector(
+    'button[onclick*="authPanel"]'
+  );
+
+  if (!loginButton) return;
+
+  if (data.session) {
+    loginButton.innerText = "Moje konto";
+  } else {
+    loginButton.innerText = "Zaloguj się";
+  }
+}
+
+updateAuthUI();
 </script>
 </body>
 </html>
