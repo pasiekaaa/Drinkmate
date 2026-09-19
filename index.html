@@ -479,6 +479,75 @@ h1 {
   display: none !important;
 }
 </style>
+  <!-- CHAT PANEL -->
+
+<div
+  id="chatPanel"
+  class="chat-panel"
+>
+  <div class="chat-shell">
+
+    <div class="chat-header">
+
+      <button
+        class="chat-back"
+        onclick="closeChat()"
+      >
+        ‹
+      </button>
+
+      <div
+        id="chatPersonName"
+        class="chat-person-name"
+      >
+        Chat
+      </div>
+
+    </div>
+
+    <div
+      id="chatMessages"
+      class="chat-messages"
+    ></div>
+
+  </div>
+
+  <div class="chat-composer">
+
+    <input
+      id="chatFile"
+      type="file"
+      accept="image/*"
+      hidden
+      onchange="handleChatFileChange()"
+    >
+
+    <button
+      class="chat-photo-btn"
+      onclick="document.getElementById('chatFile').click()"
+    >
+      📷
+    </button>
+
+    <input
+      id="chatInput"
+      class="chat-input"
+      type="text"
+      maxlength="1000"
+      placeholder="Napisz wiadomość..."
+      onkeydown="if(event.key === 'Enter') sendChatMessage()"
+    >
+
+    <button
+      class="chat-send-btn"
+      onclick="sendChatMessage()"
+    >
+      ➤
+    </button>
+
+  </div>
+
+</div>
 </head>
 
 <body>
