@@ -5,123 +5,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drinkmate</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
   background: #09090d;
-  color: white;
+  color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.app {
-  max-width: 520px;
-  min-height: 100vh;
-  margin: auto;
-  padding-bottom: 90px;
+button,
+input,
+textarea {
+  font: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
+.app {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+
+/* HEADER */
+
 header {
-  padding: 25px 20px 10px;
+  height: 86px;
+  padding: 20px 18px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .logo {
-  font-size: 27px;
+  font-size: 30px;
   font-weight: 800;
+  letter-spacing: -1.5px;
 }
 
 .logo span {
-  color: #ff6848;
+  color: #ff5b3d;
 }
 
+.account-btn {
+  border: 0;
+  background: #ff5b3d;
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-weight: 700;
+}
+
+/* STATUS */
+
 .status {
-  margin: 10px 18px 20px;
-  padding: 16px;
-  border-radius: 18px;
-  background: #16161d;
+  margin: 8px 18px 22px;
+  padding: 17px;
   border: 1px solid #292932;
+  border-radius: 20px;
+  background: #17171f;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.status small {
-  display: block;
-  color: #9999a5;
+.status-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.status-subtitle {
   margin-top: 4px;
+  color: #9999a5;
+  font-size: 14px;
 }
 
 .switch {
-  width: 50px;
-  height: 29px;
-  padding: 3px;
-  background: #393943;
-  border-radius: 20px;
+  width: 52px;
+  height: 31px;
+  padding: 4px;
+  background: #3a3a45;
+  border-radius: 30px;
+  transition: .2s;
 }
 
 .switch i {
   display: block;
   width: 23px;
   height: 23px;
-  background: white;
   border-radius: 50%;
+  background: #fff;
   transition: .2s;
 }
 
 .switch.on {
-  background: #ff6848;
+  background: #ff5b3d;
 }
 
 .switch.on i {
   transform: translateX(21px);
 }
 
+/* HEADINGS */
+
 h1 {
-  margin: 25px 18px 6px;
-  font-size: 30px;
+  margin: 25px 18px 8px;
+  font-size: 34px;
   line-height: 1.05;
+  letter-spacing: -1px;
 }
 
 .subtitle {
-  margin: 0 18px 20px;
+  margin: 0 18px 22px;
   color: #9999a5;
+  font-size: 16px;
+  line-height: 1.4;
 }
 
-.card {
+/* DISCOVER CARD */
+
+.person-card {
   margin: 0 18px;
   overflow: hidden;
+  border: 1px solid #292932;
   border-radius: 25px;
   background: #17171f;
-  border: 1px solid #292932;
 }
 
-.avatar {
-  height: 250px;
+.person-avatar {
+  height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 85px;
-  background: linear-gradient(135deg, #39394a, #16161d);
+  font-size: 90px;
+  background: linear-gradient(
+    135deg,
+    #383849,
+    #17171f
+  );
 }
 
-.info {
-  padding: 20px;
+.person-info {
+  padding: 21px;
 }
 
-.name {
-  font-size: 25px;
+.person-name {
+  font-size: 27px;
   font-weight: 800;
 }
 
-.meta {
+.person-location {
   margin-top: 5px;
-  color: #a0a0ac;
+  color: #9999a5;
+  font-size: 16px;
 }
 
 .tags {
@@ -133,14 +186,14 @@ h1 {
   padding: 7px 10px;
   margin: 3px;
   border-radius: 20px;
-  background: #272730;
+  background: #292932;
   color: #ddd;
   font-size: 13px;
 }
 
 .bio {
-  color: #c6c6cf;
-  line-height: 1.45;
+  color: #c8c8d0;
+  line-height: 1.5;
 }
 
 .actions {
@@ -149,80 +202,281 @@ h1 {
   margin-top: 18px;
 }
 
-button {
-  font-family: inherit;
-}
-
 .action {
   flex: 1;
+  padding: 16px;
   border: 0;
-  border-radius: 16px;
-  padding: 15px;
-  font-size: 16px;
+  border-radius: 15px;
   font-weight: 700;
+  font-size: 16px;
 }
 
-.no {
-  background: #292931;
-  color: white;
+.action-no {
+  background: #292932;
+  color: #fff;
 }
 
-.yes {
-  background: #ff6848;
-  color: white;
+.action-yes {
+  background: #ff5b3d;
+  color: #fff;
 }
+
+/* EMPTY */
 
 .empty {
   margin: 20px 18px;
   padding: 35px 20px;
   text-align: center;
-  border: 1px dashed #393943;
+  border: 1px dashed #3b3b46;
   border-radius: 20px;
-  color: #999;
+  color: #9999a5;
+  line-height: 1.5;
 }
 
-nav {
+.loading {
+  margin: 40px 18px;
+  text-align: center;
+  color: #9999a5;
+}
+
+/* NAV */
+
+.bottom-nav {
   position: fixed;
+  z-index: 100;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+
   width: min(520px, 100%);
-  padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
-  background: rgba(12,12,17,.96);
-  border-top: 1px solid #282832;
+
+  padding: 10px 10px calc(
+    10px + env(safe-area-inset-bottom)
+  );
+
+  background: rgba(10,10,14,.97);
+  border-top: 1px solid #292932;
+
   display: flex;
   justify-content: space-around;
 }
 
-nav button {
+.bottom-nav button {
   border: 0;
-  background: none;
-  color: #92929d;
+  background: transparent;
+  color: #777783;
   font-size: 12px;
 }
 
-nav button.active {
-  color: white;
+.bottom-nav button.active {
+  color: #fff;
 }
 
-nav b {
+.bottom-nav b {
   display: block;
-  font-size: 22px;
   margin-bottom: 3px;
+  font-size: 22px;
 }
+
+/* PANELS */
+
+.panel {
+  position: fixed;
+  z-index: 500;
+  inset: 0;
+
+  display: none;
+
+  background: #09090d;
+  overflow-y: auto;
+
+  padding:
+    20px
+    20px
+    calc(30px + env(safe-area-inset-bottom));
+}
+
+.panel-content {
+  width: 100%;
+  max-width: 500px;
+  margin: 25px auto;
+}
+
+.panel-logo {
+  margin: 10px 0 5px;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -2px;
+}
+
+.panel-logo span {
+  color: #ff5b3d;
+}
+
+.panel-description {
+  margin: 0 0 28px;
+  color: #9999a5;
+  font-size: 18px;
+}
+
+/* FORMS */
+
+.form-label {
+  display: block;
+  margin: 0 0 8px;
+  color: #aaa;
+  font-size: 15px;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  margin-bottom: 17px;
+  padding: 16px;
+
+  border: 1px solid #363640;
+  border-radius: 14px;
+
+  outline: none;
+
+  background: #17171f;
+  color: #fff;
+
+  font-size: 16px;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #ff5b3d;
+}
+
+.form-textarea {
+  min-height: 115px;
+  resize: vertical;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: 15px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.primary-btn {
+  border: 0;
+  background: #ff5b3d;
+  color: #fff;
+}
+
+.secondary-btn {
+  margin-top: 10px;
+  border: 1px solid #44444f;
+  background: #17171f;
+  color: #fff;
+}
+
+.danger-btn {
+  margin-top: 10px;
+  border: 1px solid #5a2929;
+  background: #241313;
+  color: #ff9999;
+}
+
+.message {
+  min-height: 24px;
+  margin-top: 18px;
+  text-align: center;
+  color: #9999a5;
+  line-height: 1.4;
+}
+
+/* TAG PICKER */
+
+.tag-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tag-choice {
+  border: 1px solid #3a3a45;
+  border-radius: 20px;
+  padding: 9px 12px;
+  background: #17171f;
+  color: #ccc;
+}
+
+.tag-choice.selected {
+  border-color: #ff5b3d;
+  background: #ff5b3d;
+  color: #fff;
+}
+
+/* MATCHES */
+
+.match-card {
+  margin: 0 18px 12px;
+  padding: 18px;
+  border: 1px solid #292932;
+  border-radius: 20px;
+  background: #17171f;
+}
+
+.match-title {
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.match-location {
+  margin-top: 5px;
+  color: #9999a5;
+}
+
+.match-bio {
+  color: #ccc;
+  line-height: 1.4;
+}
+
+/* TOAST */
 
 .toast {
-  display: none;
   position: fixed;
+  z-index: 1000;
   left: 50%;
-  bottom: 100px;
+  bottom: 105px;
   transform: translateX(-50%);
+
+  display: none;
+
+  max-width: 90%;
   padding: 13px 17px;
-  background: white;
-  color: #111;
+
   border-radius: 14px;
+
+  background: #fff;
+  color: #111;
+
   font-weight: 700;
-  z-index: 10;
+  text-align: center;
+}
+
+/* LOGGED OUT */
+
+.logged-out {
+  margin: 30px 18px;
+  padding: 30px 20px;
+  text-align: center;
+  border: 1px dashed #3b3b46;
+  border-radius: 20px;
+  color: #aaa;
+}
+
+.hidden {
+  display: none !important;
 }
 </style>
 </head>
@@ -232,138 +486,1367 @@ nav b {
 <div class="app">
 
 <header>
-  <div class="logo">drink<span>mate</span></div>
-  <div>🍻</div>
+
+  <div class="logo">
+    drink<span>mate</span>
+  </div>
+
+  <button
+    id="accountButton"
+    class="account-btn"
+    onclick="openAccount()"
+  >
+    Zaloguj się
+  </button>
+
 </header>
 
-<div class="status">
+
+<!-- STATUS -->
+
+<div
+  id="statusBox"
+  class="status hidden"
+>
+
   <div>
-    <strong>Jestem dostępny</strong>
-    <small>Pokaż innym, że szukasz ekipy</small>
+    <div class="status-title">
+      Jestem dostępny
+    </div>
+
+    <div class="status-subtitle">
+      Pokaż innym, że szukasz ekipy
+    </div>
   </div>
 
-  <div class="switch" id="switch" onclick="toggleStatus()">
+  <div
+    id="availabilitySwitch"
+    class="switch"
+    onclick="toggleAvailability()"
+  >
     <i></i>
   </div>
+
 </div>
 
-<h1>Ludzie, którzy<br>szukają ekipy</h1>
 
-<p class="subtitle">
-  Poznaj kogoś na drinka, piwo albo wspólne wyjście.
-</p>
+<!-- DISCOVER -->
 
-<div id="card"></div>
+<section id="discoverSection">
 
-<nav>
-  <button class="active">
+  <h1>
+    Ludzie, którzy<br>
+    szukają ekipy
+  </h1>
+
+  <p class="subtitle">
+    Poznaj kogoś na drinka, piwo albo wspólne wyjście.
+  </p>
+
+  <div id="discoverContainer"></div>
+
+</section>
+
+
+<!-- MATCHES -->
+
+<section
+  id="matchesSection"
+  class="hidden"
+>
+
+  <h1>
+    Twoje matche ❤️
+  </h1>
+
+  <p class="subtitle">
+    Ludzie, którzy również chcą się z Tobą spotkać.
+  </p>
+
+  <div id="matchesContainer"></div>
+
+</section>
+
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav">
+
+  <button
+    id="discoverNav"
+    class="active"
+    onclick="showDiscover()"
+  >
     <b>⌂</b>
     Odkrywaj
   </button>
 
-  <button onclick="showToast('❤️ Tutaj będą Twoje matche')">
+  <button
+    id="matchesNav"
+    onclick="showMatches()"
+  >
     <b>♥</b>
     Match
   </button>
 
-  <button onclick="showToast('👤 Profil będzie dostępny wkrótce')">
+  <button
+    onclick="openAccount()"
+  >
     <b>●</b>
     Profil
   </button>
-</nav>
 
-<div id="toast" class="toast"></div>
+</nav>
 
 </div>
 
+
+<!-- TOAST -->
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+<!-- AUTH PANEL -->
+
+<div
+  id="authPanel"
+  class="panel"
+>
+
+  <div class="panel-content">
+
+    <div class="panel-logo">
+      drink<span>mate</span>
+    </div>
+
+    <p class="panel-description">
+      Zaloguj się albo załóż konto.
+    </p>
+
+    <label class="form-label">
+      E-mail
+    </label>
+
+    <input
+      id="authEmail"
+      class="form-input"
+      type="email"
+      autocomplete="email"
+      placeholder="np. twojemail@gmail.com"
+    >
+
+    <label class="form-label">
+      Hasło
+    </label>
+
+    <input
+      id="authPassword"
+      class="form-input"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Minimum 6 znaków"
+    >
+
+    <button
+      class="primary-btn"
+      onclick="registerDrinkmate()"
+    >
+      Załóż konto
+    </button>
+
+    <button
+      class="secondary-btn"
+      onclick="loginDrinkmate()"
+    >
+      Zaloguj się
+    </button>
+
+    <button
+      class="secondary-btn"
+      onclick="closeAuthPanel()"
+    >
+      Zamknij
+    </button>
+
+    <div
+      id="authMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- PROFILE PANEL -->
+
+<div
+  id="profilePanel"
+  class="panel"
+>
+
+  <div class="panel-content">
+
+    <div class="panel-logo">
+      Twój profil
+    </div>
+
+    <p class="panel-description">
+      Uzupełnij informacje, żeby inni wiedzieli, z kim mają do czynienia.
+    </p>
+
+
+    <label class="form-label">
+      Nick
+    </label>
+
+    <input
+      id="profileUsername"
+      class="form-input"
+      type="text"
+      maxlength="30"
+      placeholder="np. pasieka"
+    >
+
+
+    <label class="form-label">
+      Wiek
+    </label>
+
+    <input
+      id="profileAge"
+      class="form-input"
+      type="number"
+      min="18"
+      max="99"
+      placeholder="np. 21"
+    >
+
+
+    <label class="form-label">
+      Miasto
+    </label>
+
+    <input
+      id="profileCity"
+      class="form-input"
+      type="text"
+      maxlength="50"
+      placeholder="np. Warszawa"
+    >
+
+
+    <label class="form-label">
+      O mnie
+    </label>
+
+    <textarea
+      id="profileBio"
+      class="form-textarea"
+      maxlength="250"
+      placeholder="Napisz kilka słów o sobie..."
+    ></textarea>
+
+
+    <label class="form-label">
+      Co lubisz?
+    </label>
+
+    <div
+      id="tagPicker"
+      class="tag-picker"
+    ></div>
+
+
+    <button
+      class="primary-btn"
+      onclick="saveProfile()"
+    >
+      Zapisz profil
+    </button>
+
+    <button
+      class="secondary-btn"
+      onclick="closeProfilePanel()"
+    >
+      Zamknij
+    </button>
+
+    <button
+      class="danger-btn"
+      onclick="logoutDrinkmate()"
+    >
+      Wyloguj się
+    </button>
+
+    <div
+      id="profileMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+</div>
+
+
 <script>
 
-const people = [
+/* ==========================================
+   SUPABASE
+========================================== */
 
-  {
-    name: "Kuba",
-    age: 22,
-    city: "Warszawa",
-    emoji: "🍺",
-    tags: ["piwo", "pub", "dzisiaj"],
-    bio: "Szukam ludzi na spontaniczne wyjście. Bez spiny, dobra muzyka i dużo śmiechu."
-  },
+const SUPABASE_URL =
+  "https://fdgjuysebhprtitrjnyn.supabase.co";
 
-  {
-    name: "Michał",
-    age: 21,
-    city: "Warszawa",
-    emoji: "🍹",
-    tags: ["drinki", "klub", "wieczorem"],
-    bio: "Chętnie wyskoczę na drinka albo potańczyć. Im większa ekipa, tym lepiej."
-  },
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_ICi264_y6iv9oH4LbBCjUQ_v-fE-brs";
 
-  {
-    name: "Olek",
-    age: 23,
-    city: "Łomianki",
-    emoji: "🥃",
-    tags: ["whisky", "chill", "weekend"],
-    bio: "Weekendowo szukam ekipy do baru albo domówki."
-  }
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
 
+
+/* ==========================================
+   STATE
+========================================== */
+
+let currentUser = null;
+let currentProfile = null;
+
+let people = [];
+let currentPersonIndex = 0;
+
+const TAGS = [
+  "piwo",
+  "drinki",
+  "klub",
+  "pub",
+  "domówka",
+  "chill",
+  "muzyka",
+  "weekend",
+  "dzisiaj",
+  "spontan"
 ];
 
-let current = 0;
 
-function render() {
+/* ==========================================
+   HELPERS
+========================================== */
 
-  const card = document.getElementById("card");
+function escapeHTML(value) {
 
-  if (current >= people.length) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
-    card.innerHTML = `
+}
+
+
+function showToast(message) {
+
+  const toast =
+    document.getElementById("toast");
+
+  toast.innerText = message;
+
+  toast.style.display = "block";
+
+  clearTimeout(window.toastTimeout);
+
+  window.toastTimeout =
+    setTimeout(() => {
+
+      toast.style.display = "none";
+
+    }, 2200);
+
+}
+
+
+/* ==========================================
+   AUTH PANEL
+========================================== */
+
+function openAuthPanel() {
+
+  document
+    .getElementById("authPanel")
+    .style.display = "block";
+
+}
+
+
+function closeAuthPanel() {
+
+  document
+    .getElementById("authPanel")
+    .style.display = "none";
+
+}
+
+
+function openAccount() {
+
+  if (currentUser) {
+
+    openProfilePanel();
+
+  } else {
+
+    openAuthPanel();
+
+  }
+
+}
+
+
+/* ==========================================
+   REGISTER
+========================================== */
+
+async function registerDrinkmate() {
+
+  const email =
+    document
+      .getElementById("authEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("authPassword")
+      .value;
+
+  const message =
+    document.getElementById(
+      "authMessage"
+    );
+
+
+  if (!email || !password) {
+
+    message.innerText =
+      "Wpisz e-mail i hasło.";
+
+    return;
+
+  }
+
+
+  if (password.length < 6) {
+
+    message.innerText =
+      "Hasło musi mieć minimum 6 znaków.";
+
+    return;
+
+  }
+
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+      email,
+      password
+    });
+
+
+  if (error) {
+
+    message.innerText =
+      "Błąd: " + error.message;
+
+    return;
+
+  }
+
+
+  if (data.session) {
+
+    currentUser =
+      data.user;
+
+    await loadProfile();
+
+    closeAuthPanel();
+
+    updateUI();
+
+    showToast(
+      "Konto utworzone 🎉"
+    );
+
+    openProfilePanel();
+
+  } else {
+
+    message.innerText =
+      "Konto utworzone 🎉 Możesz się teraz zalogować.";
+
+  }
+
+}
+
+
+/* ==========================================
+   LOGIN
+========================================== */
+
+async function loginDrinkmate() {
+
+  const email =
+    document
+      .getElementById("authEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("authPassword")
+      .value;
+
+  const message =
+    document.getElementById(
+      "authMessage"
+    );
+
+
+  if (!email || !password) {
+
+    message.innerText =
+      "Wpisz e-mail i hasło.";
+
+    return;
+
+  }
+
+
+  const { data, error } =
+    await supabaseClient.auth
+      .signInWithPassword({
+        email,
+        password
+      });
+
+
+  if (error) {
+
+    message.innerText =
+      "Błąd logowania: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  currentUser =
+    data.user;
+
+
+  await loadProfile();
+
+
+  closeAuthPanel();
+
+  updateUI();
+
+  await loadPeople();
+
+  showToast(
+    "Zalogowano 🎉"
+  );
+
+}
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+async function logoutDrinkmate() {
+
+  await supabaseClient.auth.signOut();
+
+  currentUser = null;
+  currentProfile = null;
+
+  people = [];
+  currentPersonIndex = 0;
+
+  closeProfilePanel();
+
+  updateUI();
+
+  renderLoggedOut();
+
+  showToast(
+    "Wylogowano"
+  );
+
+}
+
+
+/* ==========================================
+   AUTH STATE
+========================================== */
+
+supabaseClient.auth.onAuthStateChange(
+  (event, session) => {
+
+    setTimeout(
+      async () => {
+
+        if (session) {
+
+          currentUser =
+            session.user;
+
+          await loadProfile();
+
+          updateUI();
+
+          await loadPeople();
+
+        } else {
+
+          currentUser = null;
+          currentProfile = null;
+
+          updateUI();
+
+          renderLoggedOut();
+
+        }
+
+      },
+      0
+    );
+
+  }
+);
+
+
+/* ==========================================
+   LOAD PROFILE
+========================================== */
+
+async function loadProfile() {
+
+  if (!currentUser) return;
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,username,age,city,bio,available,tags"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if (error) {
+
+    console.error(
+      "Profile error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  currentProfile =
+    data || null;
+
+
+  fillProfileForm();
+
+}
+
+
+/* ==========================================
+   PROFILE FORM
+========================================== */
+
+function fillProfileForm() {
+
+  if (!currentProfile) {
+
+    document.getElementById(
+      "profileUsername"
+    ).value = "";
+
+    document.getElementById(
+      "profileAge"
+    ).value = "";
+
+    document.getElementById(
+      "profileCity"
+    ).value = "";
+
+    document.getElementById(
+      "profileBio"
+    ).value = "";
+
+    renderTagPicker([]);
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "profileUsername"
+  ).value =
+    currentProfile.username || "";
+
+
+  document.getElementById(
+    "profileAge"
+  ).value =
+    currentProfile.age || "";
+
+
+  document.getElementById(
+    "profileCity"
+  ).value =
+    currentProfile.city || "";
+
+
+  document.getElementById(
+    "profileBio"
+  ).value =
+    currentProfile.bio || "";
+
+
+  renderTagPicker(
+    Array.isArray(currentProfile.tags)
+      ? currentProfile.tags
+      : []
+  );
+
+}
+
+
+function renderTagPicker(
+  selectedTags
+) {
+
+  const picker =
+    document.getElementById(
+      "tagPicker"
+    );
+
+
+  picker.innerHTML =
+    TAGS.map(tag => {
+
+      const selected =
+        selectedTags.includes(tag)
+          ? "selected"
+          : "";
+
+
+      return `
+        <button
+          type="button"
+          class="tag-choice ${selected}"
+          data-tag="${escapeHTML(tag)}"
+          onclick="toggleTag(this)"
+        >
+          #${escapeHTML(tag)}
+        </button>
+      `;
+
+    }).join("");
+
+}
+
+
+function toggleTag(button) {
+
+  button.classList.toggle(
+    "selected"
+  );
+
+}
+
+
+function getSelectedTags() {
+
+  return Array.from(
+    document.querySelectorAll(
+      ".tag-choice.selected"
+    )
+  ).map(
+    button =>
+      button.dataset.tag
+  );
+
+}
+
+
+/* ==========================================
+   SAVE PROFILE
+========================================== */
+
+async function saveProfile() {
+
+  const message =
+    document.getElementById(
+      "profileMessage"
+    );
+
+
+  if (!currentUser) {
+
+    message.innerText =
+      "Musisz być zalogowany.";
+
+    return;
+
+  }
+
+
+  const username =
+    document
+      .getElementById(
+        "profileUsername"
+      )
+      .value
+      .trim();
+
+
+  const age =
+    Number(
+      document
+        .getElementById(
+          "profileAge"
+        )
+        .value
+    );
+
+
+  const city =
+    document
+      .getElementById(
+        "profileCity"
+      )
+      .value
+      .trim();
+
+
+  const bio =
+    document
+      .getElementById(
+        "profileBio"
+      )
+      .value
+      .trim();
+
+
+  const tags =
+    getSelectedTags();
+
+
+  if (!username) {
+
+    message.innerText =
+      "Wpisz nick.";
+
+    return;
+
+  }
+
+
+  if (
+    !age ||
+    age < 18 ||
+    age > 99
+  ) {
+
+    message.innerText =
+      "Wiek musi być między 18 a 99.";
+
+    return;
+
+  }
+
+
+  if (!city) {
+
+    message.innerText =
+      "Wpisz miasto.";
+
+    return;
+
+  }
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .upsert(
+        {
+          id: currentUser.id,
+          username,
+          age,
+          city,
+          bio,
+          tags
+        },
+        {
+          onConflict: "id"
+        }
+      )
+      .select()
+      .single();
+
+
+  if (error) {
+
+    console.error(error);
+
+    message.innerText =
+      "Błąd zapisu: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  currentProfile =
+    data;
+
+
+  message.innerText =
+    "Profil zapisany 🎉";
+
+
+  updateUI();
+
+  await loadPeople();
+
+  showToast(
+    "Profil zapisany 🎉"
+  );
+
+}
+
+
+/* ==========================================
+   PROFILE PANEL
+========================================== */
+
+function openProfilePanel() {
+
+  if (!currentUser) {
+
+    openAuthPanel();
+
+    return;
+
+  }
+
+
+  fillProfileForm();
+
+
+  document
+    .getElementById(
+      "profilePanel"
+    )
+    .style.display = "block";
+
+}
+
+
+function closeProfilePanel() {
+
+  document
+    .getElementById(
+      "profilePanel"
+    )
+    .style.display = "none";
+
+}
+
+
+/* ==========================================
+   AVAILABILITY
+========================================== */
+
+async function toggleAvailability() {
+
+  if (!currentUser) {
+
+    openAuthPanel();
+
+    return;
+
+  }
+
+
+  const newValue =
+    !(
+      currentProfile &&
+      currentProfile.available
+    );
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .upsert(
+        {
+          id: currentUser.id,
+          available: newValue
+        },
+        {
+          onConflict: "id"
+        }
+      )
+      .select()
+      .single();
+
+
+  if (error) {
+
+    showToast(
+      "Błąd: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  currentProfile =
+    data;
+
+
+  updateAvailabilityUI();
+
+  await loadPeople();
+
+
+  showToast(
+    newValue
+      ? "Jesteś dostępny 🟢"
+      : "Nie jesteś już dostępny"
+  );
+
+}
+
+
+function updateAvailabilityUI() {
+
+  const box =
+    document.getElementById(
+      "statusBox"
+    );
+
+  const switchElement =
+    document.getElementById(
+      "availabilitySwitch"
+    );
+
+
+  if (!currentUser) {
+
+    box.classList.add(
+      "hidden"
+    );
+
+    return;
+
+  }
+
+
+  box.classList.remove(
+    "hidden"
+  );
+
+
+  if (
+    currentProfile &&
+    currentProfile.available
+  ) {
+
+    switchElement.classList.add(
+      "on"
+    );
+
+  } else {
+
+    switchElement.classList.remove(
+      "on"
+    );
+
+  }
+
+}
+
+
+/* ==========================================
+   UI
+========================================== */
+
+function updateUI() {
+
+  const accountButton =
+    document.getElementById(
+      "accountButton"
+    );
+
+
+  if (currentUser) {
+
+    accountButton.innerText =
+      currentProfile &&
+      currentProfile.username
+        ? currentProfile.username
+        : "Moje konto";
+
+  } else {
+
+    accountButton.innerText =
+      "Zaloguj się";
+
+  }
+
+
+  updateAvailabilityUI();
+
+}
+
+
+/* ==========================================
+   LOAD PEOPLE
+========================================== */
+
+async function loadPeople() {
+
+  if (!currentUser) {
+
+    renderLoggedOut();
+
+    return;
+
+  }
+
+
+  const container =
+    document.getElementById(
+      "discoverContainer"
+    );
+
+
+  container.innerHTML = `
+    <div class="loading">
+      Szukam ludzi... 🍻
+    </div>
+  `;
+
+
+  const { data: profiles, error } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,username,age,city,bio,available,tags"
+      )
+      .eq(
+        "available",
+        true
+      )
+      .neq(
+        "id",
+        currentUser.id
+      );
+
+
+  if (error) {
+
+    container.innerHTML = `
       <div class="empty">
-        🍻 To na razie wszyscy w pobliżu.
+        Nie udało się pobrać użytkowników.
+        <br><br>
+        ${escapeHTML(error.message)}
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const { data: likes } =
+    await supabaseClient
+      .from("likes")
+      .select("to_user")
+      .eq(
+        "from_user",
+        currentUser.id
+      );
+
+
+  const likedIds =
+    new Set(
+      (likes || []).map(
+        like =>
+          like.to_user
+      )
+    );
+
+
+  people =
+    (profiles || [])
+      .filter(
+        profile =>
+          profile.username &&
+          profile.age >= 18 &&
+          !likedIds.has(profile.id)
+      );
+
+
+  currentPersonIndex = 0;
+
+
+  renderPerson();
+
+}
+
+
+/* ==========================================
+   RENDER PERSON
+========================================== */
+
+function renderPerson() {
+
+  const container =
+    document.getElementById(
+      "discoverContainer"
+    );
+
+
+  if (!currentUser) {
+
+    renderLoggedOut();
+
+    return;
+
+  }
+
+
+  if (!people.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        🍻 Na razie nie ma nowych osób.
+        <br><br>
+        Wróć później albo włącz swoją dostępność.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    currentPersonIndex >=
+    people.length
+  ) {
+
+    container.innerHTML = `
+      <div class="empty">
+        🍻 To na razie wszyscy.
         <br><br>
         Wróć później i sprawdź ponownie.
       </div>
     `;
 
     return;
+
   }
 
-  const person = people[current];
 
-  card.innerHTML = `
-    <article class="card">
+  const person =
+    people[currentPersonIndex];
 
-      <div class="avatar">
-        ${person.emoji}
+
+  const tags =
+    Array.isArray(person.tags)
+      ? person.tags
+      : [];
+
+
+  const tagHTML =
+    tags.map(tag => `
+      <span class="tag">
+        #${escapeHTML(tag)}
+      </span>
+    `).join("");
+
+
+  container.innerHTML = `
+    <article class="person-card">
+
+      <div class="person-avatar">
+        🍻
       </div>
 
-      <div class="info">
+      <div class="person-info">
 
-        <div class="name">
-          ${person.name}, ${person.age}
+        <div class="person-name">
+          ${escapeHTML(person.username)},
+          ${person.age}
         </div>
 
-        <div class="meta">
-          📍 ${person.city}
+        <div class="person-location">
+          📍 ${escapeHTML(person.city || "Brak miasta")}
         </div>
 
         <div class="tags">
-          ${person.tags.map(tag =>
-            `<span class="tag">#${tag}</span>`
-          ).join("")}
+          ${tagHTML}
         </div>
 
         <p class="bio">
-          ${person.bio}
+          ${escapeHTML(
+            person.bio ||
+            "Brak opisu."
+          )}
         </p>
 
         <div class="actions">
 
-          <button class="action no" onclick="nextPerson()">
+          <button
+            class="action action-no"
+            onclick="skipPerson()"
+          >
             ✕ Nie
           </button>
 
-          <button class="action yes" onclick="likePerson()">
+          <button
+            class="action action-yes"
+            onclick="likePerson()"
+          >
             ♥ Chcę iść
           </button>
 
@@ -373,410 +1856,412 @@ function render() {
 
     </article>
   `;
+
 }
 
-function nextPerson() {
-  current++;
-  render();
+
+/* ==========================================
+   SKIP
+========================================== */
+
+function skipPerson() {
+
+  currentPersonIndex++;
+
+  renderPerson();
+
 }
 
-function likePerson() {
 
-  showToast("💥 Match! Możecie zacząć rozmowę");
+/* ==========================================
+   LIKE
+========================================== */
 
-  current++;
+async function likePerson() {
 
-  setTimeout(render, 600);
+  if (!currentUser) {
+
+    openAuthPanel();
+
+    return;
+
+  }
+
+
+  const person =
+    people[currentPersonIndex];
+
+
+  if (!person) return;
+
+
+  const { error } =
+    await supabaseClient
+      .from("likes")
+      .upsert(
+        {
+          from_user:
+            currentUser.id,
+
+          to_user:
+            person.id
+        },
+        {
+          onConflict:
+            "from_user,to_user"
+        }
+      );
+
+
+  if (error) {
+
+    showToast(
+      "Błąd: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data: mutual
+  } =
+    await supabaseClient
+      .from("likes")
+      .select("id")
+      .eq(
+        "from_user",
+        person.id
+      )
+      .eq(
+        "to_user",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  currentPersonIndex++;
+
+
+  if (mutual) {
+
+    showToast(
+      "💥 MATCH! Oboje chcecie iść!"
+    );
+
+  } else {
+
+    showToast(
+      "❤️ Polubiono!"
+    );
+
+  }
+
+
+  setTimeout(
+    renderPerson,
+    350
+  );
+
 }
 
-function toggleStatus() {
+
+/* ==========================================
+   MATCHES
+========================================== */
+
+async function showMatches() {
 
   document
-    .getElementById("switch")
-    .classList.toggle("on");
+    .getElementById(
+      "discoverSection"
+    )
+    .classList.add("hidden");
 
-  showToast("Status został zmieniony");
+
+  document
+    .getElementById(
+      "matchesSection"
+    )
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById(
+      "discoverNav"
+    )
+    .classList.remove("active");
+
+
+  document
+    .getElementById(
+      "matchesNav"
+    )
+    .classList.add("active");
+
+
+  await loadMatches();
+
 }
 
-function showToast(message) {
 
-  const toast = document.getElementById("toast");
+function showDiscover() {
 
-  toast.innerText = message;
-  toast.style.display = "block";
+  document
+    .getElementById(
+      "discoverSection"
+    )
+    .classList.remove("hidden");
 
-  clearTimeout(window.toastTimer);
 
-  window.toastTimer = setTimeout(() => {
-    toast.style.display = "none";
-  }, 1800);
+  document
+    .getElementById(
+      "matchesSection"
+    )
+    .classList.add("hidden");
+
+
+  document
+    .getElementById(
+      "discoverNav"
+    )
+    .classList.add("active");
+
+
+  document
+    .getElementById(
+      "matchesNav"
+    )
+    .classList.remove("active");
+
+
+  renderPerson();
+
 }
 
-render();
 
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+async function loadMatches() {
 
-<script>
-  const SUPABASE_URL = "https://fdgjuysebhprtitrjnyn.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ICi264_y6iv9oH4LbBCjUQ_v-fE-brs";
+  const container =
+    document.getElementById(
+      "matchesContainer"
+    );
 
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
 
-  console.log("Drinkmate: Supabase połączony");
-</script>
-  <div id="authPanel" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:#09090d;
-  padding:30px 22px;
-  overflow:auto;
-">
-  <div style="max-width:500px;margin:40px auto;">
-    <h1 style="font-size:42px;margin-bottom:8px;">
-      drink<span style="color:#ff5b3d;">mate</span>
-    </h1>
+  if (!currentUser) {
 
-    <p style="color:#999;font-size:18px;margin-bottom:30px;">
-      Zaloguj się albo załóż konto
-    </p>
+    container.innerHTML = `
+      <div class="empty">
+        Zaloguj się, żeby zobaczyć matche.
+      </div>
+    `;
 
-    <input
-      id="authEmail"
-      type="email"
-      placeholder="E-mail"
-      style="
-        width:100%;
-        padding:16px;
-        margin-bottom:12px;
-        border-radius:14px;
-        border:1px solid #333;
-        background:#17171f;
-        color:white;
-        font-size:16px;
-      "
-    >
-
-    <input
-      id="authPassword"
-      type="password"
-      placeholder="Hasło"
-      style="
-        width:100%;
-        padding:16px;
-        margin-bottom:16px;
-        border-radius:14px;
-        border:1px solid #333;
-        background:#17171f;
-        color:white;
-        font-size:16px;
-      "
-    >
-
-    <button
-      onclick="registerDrinkmate()"
-      style="
-        width:100%;
-        padding:17px;
-        border:0;
-        border-radius:14px;
-        background:#ff5b3d;
-        color:white;
-        font-size:17px;
-        font-weight:700;
-        margin-bottom:10px;
-      "
-    >
-      Załóż konto
-    </button>
-
-    <button
-      onclick="loginDrinkmate()"
-      style="
-        width:100%;
-        padding:17px;
-        border:1px solid #444;
-        border-radius:14px;
-        background:#17171f;
-        color:white;
-        font-size:17px;
-        font-weight:700;
-      "
-    >
-      Zaloguj się
-    </button>
-
-    <p id="authMessage" style="
-      margin-top:20px;
-      color:#aaa;
-      text-align:center;
-      line-height:1.5;
-    "></p>
-  </div>
-</div>
-
-<script>
-async function registerDrinkmate() {
-  const email = document.getElementById("authEmail").value.trim();
-  const password = document.getElementById("authPassword").value;
-
-  if (!email || !password) {
-    document.getElementById("authMessage").innerText =
-      "Wpisz e-mail i hasło.";
     return;
+
   }
 
-  if (password.length < 6) {
-    document.getElementById("authMessage").innerText =
-      "Hasło musi mieć minimum 6 znaków.";
+
+  container.innerHTML = `
+    <div class="loading">
+      Ładowanie matchy...
+    </div>
+  `;
+
+
+  const { data: outgoing } =
+    await supabaseClient
+      .from("likes")
+      .select("to_user")
+      .eq(
+        "from_user",
+        currentUser.id
+      );
+
+
+  const { data: incoming } =
+    await supabaseClient
+      .from("likes")
+      .select("from_user")
+      .eq(
+        "to_user",
+        currentUser.id
+      );
+
+
+  const outgoingIds =
+    new Set(
+      (outgoing || []).map(
+        row =>
+          row.to_user
+      )
+    );
+
+
+  const incomingIds =
+    new Set(
+      (incoming || []).map(
+        row =>
+          row.from_user
+      )
+    );
+
+
+  const matchIds =
+    [...outgoingIds].filter(
+      id =>
+        incomingIds.has(id)
+    );
+
+
+  if (!matchIds.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        ❤️ Nie masz jeszcze żadnych matchy.
+        <br><br>
+        Przeglądaj ludzi i zobacz, co się wydarzy.
+      </div>
+    `;
+
     return;
+
   }
 
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password
-  });
+
+  const { data: profiles, error } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,username,age,city,bio,tags"
+      )
+      .in(
+        "id",
+        matchIds
+      );
+
 
   if (error) {
-    document.getElementById("authMessage").innerText =
-      "Błąd: " + error.message;
+
+    container.innerHTML = `
+      <div class="empty">
+        ${escapeHTML(error.message)}
+      </div>
+    `;
+
     return;
+
   }
 
-  document.getElementById("authMessage").innerText =
-    "Konto zostało utworzone 🎉";
 
-  console.log("Nowy użytkownik:", data.user);
+  container.innerHTML =
+    profiles.map(profile => {
+
+      return `
+        <div class="match-card">
+
+          <div class="match-title">
+            💥 ${escapeHTML(
+              profile.username
+            )}, ${profile.age}
+          </div>
+
+          <div class="match-location">
+            📍 ${escapeHTML(
+              profile.city || ""
+            )}
+          </div>
+
+          <p class="match-bio">
+            ${escapeHTML(
+              profile.bio ||
+              "Brak opisu."
+            )}
+          </p>
+
+        </div>
+      `;
+
+    }).join("");
+
 }
 
-async function loginDrinkmate() {
-  const email = document.getElementById("authEmail").value.trim();
-  const password = document.getElementById("authPassword").value;
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
+/* ==========================================
+   LOGGED OUT
+========================================== */
 
-  if (error) {
-    document.getElementById("authMessage").innerText =
-      "Błąd logowania: " + error.message;
-    return;
-  }
+function renderLoggedOut() {
 
-  document.getElementById("authMessage").innerText =
-    "Zalogowano 🎉";
+  document.getElementById(
+    "discoverContainer"
+  ).innerHTML = `
+    <div class="logged-out">
 
-  console.log("Zalogowany użytkownik:", data.user);
-}
-</script>
-  <button
-  onclick="document.getElementById('authPanel').style.display='block'"
-  style="
-    position:fixed;
-    top:20px;
-    right:20px;
-    z-index:9998;
-    padding:12px 18px;
-    border:0;
-    border-radius:12px;
-    background:#ff5b3d;
-    color:white;
-    font-weight:700;
-    font-size:15px;
-  "
->
-  Zaloguj się
-</button>
-<div id="profilePanel" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:9997;
-  background:#09090d;
-  padding:30px 22px;
-  overflow:auto;
-">
-  <div style="max-width:500px;margin:40px auto;">
+      🍻
 
-    <h1 style="font-size:36px;margin-bottom:8px;">
-      Twój profil
-    </h1>
+      <br><br>
 
-    <p style="color:#999;font-size:17px;margin-bottom:30px;">
-      Uzupełnij podstawowe informacje.
-    </p>
+      Zaloguj się, żeby zobaczyć ludzi
+      i korzystać z Drinkmate.
 
-    <label style="display:block;color:#aaa;margin-bottom:8px;">
-      Nick
-    </label>
+      <br><br>
 
-    <input
-      id="profileUsername"
-      type="text"
-      placeholder="np. Kuba"
-      maxlength="30"
-      style="
-        width:100%;
-        box-sizing:border-box;
-        padding:16px;
-        margin-bottom:18px;
-        border-radius:14px;
-        border:1px solid #333;
-        background:#17171f;
-        color:white;
-        font-size:16px;
-      "
-    >
+      <button
+        class="primary-btn"
+        onclick="openAuthPanel()"
+      >
+        Zaloguj się
+      </button>
 
-    <button
-      onclick="saveDrinkmateProfile()"
-      style="
-        width:100%;
-        padding:17px;
-        border:0;
-        border-radius:14px;
-        background:#ff5b3d;
-        color:white;
-        font-size:17px;
-        font-weight:700;
-      "
-    >
-      Zapisz profil
-    </button>
+    </div>
+  `;
 
-    <button
-      onclick="closeProfilePanel()"
-      style="
-        width:100%;
-        padding:17px;
-        margin-top:10px;
-        border:1px solid #444;
-        border-radius:14px;
-        background:#17171f;
-        color:white;
-        font-size:17px;
-        font-weight:700;
-      "
-    >
-      Zamknij
-    </button>
-
-    <p id="profileMessage" style="
-      margin-top:20px;
-      color:#aaa;
-      text-align:center;
-      line-height:1.5;
-    "></p>
-
-  </div>
-</div>
-
-<button
-  onclick="openProfilePanel()"
-  style="
-    position:fixed;
-    top:20px;
-    left:20px;
-    z-index:9998;
-    padding:12px 18px;
-    border:0;
-    border-radius:12px;
-    background:#ff5b3d;
-    color:white;
-    font-weight:700;
-    font-size:15px;
-  "
->
-  Profil
-</button>
-
-<script>
-async function openProfilePanel() {
-  const { data, error } = await supabaseClient.auth.getUser();
-
-  if (error || !data.user) {
-    alert("Najpierw się zaloguj.");
-    return;
-  }
-
-  document.getElementById("profilePanel").style.display = "block";
-
-  const { data: profile } = await supabaseClient
-    .from("profiles")
-    .select("username")
-    .eq("id", data.user.id)
-    .maybeSingle();
-
-  if (profile && profile.username) {
-    document.getElementById("profileUsername").value =
-      profile.username;
-  }
 }
 
-function closeProfilePanel() {
-  document.getElementById("profilePanel").style.display = "none";
-}
 
-async function saveDrinkmateProfile() {
-  const username =
-    document.getElementById("profileUsername").value.trim();
+/* ==========================================
+   INITIAL LOAD
+========================================== */
 
-  const message =
-    document.getElementById("profileMessage");
+async function init() {
 
-  if (!username) {
-    message.innerText = "Wpisz nick.";
-    return;
-  }
+  renderTagPicker([]);
 
-  const { data: userData, error: userError } =
-    await supabaseClient.auth.getUser();
+  const {
+    data
+  } =
+    await supabaseClient.auth.getSession();
 
-  if (userError || !userData.user) {
-    message.innerText = "Musisz być zalogowany.";
-    return;
-  }
-
-  const { error } = await supabaseClient
-    .from("profiles")
-    .upsert({
-      id: userData.user.id,
-      username: username
-    });
-
-  if (error) {
-    message.innerText =
-      "Błąd: " + error.message;
-    return;
-  }
-
-  message.innerText =
-    "Profil zapisany 🎉";
-}
-async function updateAuthUI() {
-  const { data } = await supabaseClient.auth.getSession();
-
-  const loginButton = document.querySelector(
-    'button[onclick*="authPanel"]'
-  );
-
-  if (!loginButton) return;
 
   if (data.session) {
-    loginButton.innerText = "Moje konto";
+
+    currentUser =
+      data.session.user;
+
+    await loadProfile();
+
+    updateUI();
+
+    await loadPeople();
+
   } else {
-    loginButton.innerText = "Zaloguj się";
+
+    currentUser = null;
+
+    updateUI();
+
+    renderLoggedOut();
+
   }
+
 }
 
-updateAuthUI();
+
+init();
 
 </script>
+
 </body>
 </html>
