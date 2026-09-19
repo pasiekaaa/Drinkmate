@@ -489,19 +489,20 @@ h1 {
 }
 }
 </style>
-  <!-- CHAT PANEL -->
 
-<div
-  id="chatPanel"
-  class="chat-panel"
->
+</head>
+
+<body>
+<!-- CHAT PANEL -->
+<div id="chatPanel" class="chat-panel">
+
   <div class="chat-shell">
 
     <div class="chat-header">
-
       <button
         class="chat-back"
         onclick="closeChat()"
+        type="button"
       >
         ‹
       </button>
@@ -512,7 +513,6 @@ h1 {
       >
         Chat
       </div>
-
     </div>
 
     <div
@@ -520,48 +520,47 @@ h1 {
       class="chat-messages"
     ></div>
 
-  </div>
+    <div class="chat-composer">
 
-  <div class="chat-composer">
+      <input
+        id="chatFileInput"
+        type="file"
+        accept="image/*"
+        style="display:none"
+        onchange="handleChatFileChange(event)"
+      >
 
-    <input
-      id="chatFile"
-      type="file"
-      accept="image/*"
-      hidden
-      onchange="handleChatFileChange()"
-    >
+      <button
+        class="chat-photo-btn"
+        type="button"
+        onclick="document.getElementById('chatFileInput').click()"
+      >
+        📷
+      </button>
 
-    <button
-      class="chat-photo-btn"
-      onclick="document.getElementById('chatFile').click()"
-    >
-      📷
-    </button>
+      <input
+        id="chatInput"
+        class="chat-input"
+        type="text"
+        maxlength="1000"
+        placeholder="Napisz wiadomość..."
+        onkeydown="if(event.key === 'Enter') sendChatMessage()"
+      >
 
-    <input
-      id="chatInput"
-      class="chat-input"
-      type="text"
-      maxlength="1000"
-      placeholder="Napisz wiadomość..."
-      onkeydown="if(event.key === 'Enter') sendChatMessage()"
-    >
+      <button
+        class="chat-send-btn"
+        type="button"
+        onclick="sendChatMessage()"
+      >
+        ➤
+      </button>
 
-    <button
-      class="chat-send-btn"
-      onclick="sendChatMessage()"
-    >
-      ➤
-    </button>
+    </div>
 
   </div>
 
 </div>
-</head>
-
-<body>
-
+  
 <div class="app">
 
 <header>
