@@ -415,6 +415,18 @@ function showToast(message) {
 render();
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+  const SUPABASE_URL = "https://fdgjuysebhprtitrjnyn.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ICi264_y6iv9oH4LbBCjUQ_v-fE-brs";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  console.log("Drinkmate: Supabase połączony");
+</script>
 </body>
 </html>
