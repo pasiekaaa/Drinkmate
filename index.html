@@ -2241,6 +2241,12 @@ async function loadMatches() {
               "Brak opisu."
             )}
           </p>
+          <button
+  class="primary-btn"
+  onclick="openChat('${profile.id}', '${escapeHTML(profile.username)}')"
+>
+  💬 Napisz
+</button>
 
         </div>
       `;
