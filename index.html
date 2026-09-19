@@ -428,5 +428,170 @@ render();
 
   console.log("Drinkmate: Supabase połączony");
 </script>
+  <div id="authPanel" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#09090d;
+  padding:30px 22px;
+  overflow:auto;
+">
+  <div style="max-width:500px;margin:40px auto;">
+    <h1 style="font-size:42px;margin-bottom:8px;">
+      drink<span style="color:#ff5b3d;">mate</span>
+    </h1>
+
+    <p style="color:#999;font-size:18px;margin-bottom:30px;">
+      Zaloguj się albo załóż konto
+    </p>
+
+    <input
+      id="authEmail"
+      type="email"
+      placeholder="E-mail"
+      style="
+        width:100%;
+        padding:16px;
+        margin-bottom:12px;
+        border-radius:14px;
+        border:1px solid #333;
+        background:#17171f;
+        color:white;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="authPassword"
+      type="password"
+      placeholder="Hasło"
+      style="
+        width:100%;
+        padding:16px;
+        margin-bottom:16px;
+        border-radius:14px;
+        border:1px solid #333;
+        background:#17171f;
+        color:white;
+        font-size:16px;
+      "
+    >
+
+    <button
+      onclick="registerDrinkmate()"
+      style="
+        width:100%;
+        padding:17px;
+        border:0;
+        border-radius:14px;
+        background:#ff5b3d;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+        margin-bottom:10px;
+      "
+    >
+      Załóż konto
+    </button>
+
+    <button
+      onclick="loginDrinkmate()"
+      style="
+        width:100%;
+        padding:17px;
+        border:1px solid #444;
+        border-radius:14px;
+        background:#17171f;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+      "
+    >
+      Zaloguj się
+    </button>
+
+    <p id="authMessage" style="
+      margin-top:20px;
+      color:#aaa;
+      text-align:center;
+      line-height:1.5;
+    "></p>
+  </div>
+</div>
+
+<script>
+async function registerDrinkmate() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  if (!email || !password) {
+    document.getElementById("authMessage").innerText =
+      "Wpisz e-mail i hasło.";
+    return;
+  }
+
+  if (password.length < 6) {
+    document.getElementById("authMessage").innerText =
+      "Hasło musi mieć minimum 6 znaków.";
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    document.getElementById("authMessage").innerText =
+      "Błąd: " + error.message;
+    return;
+  }
+
+  document.getElementById("authMessage").innerText =
+    "Konto zostało utworzone 🎉";
+
+  console.log("Nowy użytkownik:", data.user);
+}
+
+async function loginDrinkmate() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    document.getElementById("authMessage").innerText =
+      "Błąd logowania: " + error.message;
+    return;
+  }
+
+  document.getElementById("authMessage").innerText =
+    "Zalogowano 🎉";
+
+  console.log("Zalogowany użytkownik:", data.user);
+}
+</script>
+  <button
+  onclick="document.getElementById('authPanel').style.display='block'"
+  style="
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:9998;
+    padding:12px 18px;
+    border:0;
+    border-radius:12px;
+    background:#ff5b3d;
+    color:white;
+    font-weight:700;
+    font-size:15px;
+  "
+>
+  Zaloguj się
+</button>
 </body>
 </html>
