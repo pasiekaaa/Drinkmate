@@ -2315,7 +2315,402 @@ async function init() {
 
 
 init();
+/* ==========================================
+   CHAT
+========================================== */
 
+let currentChatUser = null;
+let chatPoller = null;
+let selectedChatFile = null;
+
+
+/* OPEN CHAT */
+
+async function openChat(userId, username) {
+
+  if (!currentUser) {
+    openAuthPanel();
+    return;
+  }
+
+  currentChatUser = {
+    id: userId,
+    username: username
+  };
+
+  document.getElementById("chatPersonName").innerText =
+    username;
+
+  document.getElementById("chatPanel").style.display =
+    "block";
+
+  document.getElementById("chatInput").value = "";
+
+  selectedChatFile = null;
+
+  await loadChatMessages();
+
+  clearInterval(chatPoller);
+
+  chatPoller = setInterval(
+    loadChatMessages,
+    2500
+  );
+
+}
+
+
+/* CLOSE CHAT */
+
+function closeChat() {
+
+  clearInterval(chatPoller);
+
+  chatPoller = null;
+
+  currentChatUser = null;
+
+  selectedChatFile = null;
+
+  document.getElementById("chatPanel").style.display =
+    "none";
+
+}
+
+
+/* LOAD MESSAGES */
+
+async function loadChatMessages() {
+
+  if (!currentUser || !currentChatUser) {
+    return;
+  }
+
+  const otherUser =
+    currentChatUser.id;
+
+  const { data: messages, error } =
+    await supabaseClient
+      .from("messages")
+      .select(
+        "id,from_user,to_user,body,image_path,created_at"
+      )
+      .or(
+        `and(from_user.eq.${currentUser.id},to_user.eq.${otherUser}),and(from_user.eq.${otherUser},to_user.eq.${currentUser.id})`
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
+
+  if (error) {
+
+    console.error(
+      "Chat error:",
+      error
+    );
+
+    return;
+  }
+
+  const container =
+    document.getElementById(
+      "chatMessages"
+    );
+
+  if (!messages || !messages.length) {
+
+    container.innerHTML = `
+      <div class="chat-empty">
+        Jeszcze nie macie żadnych wiadomości.
+        <br><br>
+        Napisz pierwszą 👋
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const html = [];
+
+  for (const message of messages) {
+
+    const mine =
+      message.from_user === currentUser.id;
+
+    let content = "";
+
+    if (message.body) {
+
+      content += `
+        <div>
+          ${escapeHTML(message.body)}
+        </div>
+      `;
+
+    }
+
+
+    if (message.image_path) {
+
+      const { data: signedData } =
+        await supabaseClient
+          .storage
+          .from("chat-images")
+          .createSignedUrl(
+            message.image_path,
+            3600
+          );
+
+      if (
+        signedData &&
+        signedData.signedUrl
+      ) {
+
+        content += `
+          <img
+            class="chat-photo"
+            src="${signedData.signedUrl}"
+            alt="Zdjęcie"
+          >
+        `;
+
+      }
+
+    }
+
+
+    html.push(`
+      <div
+        class="chat-message ${mine ? "mine" : ""}"
+      >
+        <div class="chat-bubble">
+          ${content}
+        </div>
+      </div>
+    `);
+
+  }
+
+
+  const wasNearBottom =
+    container.scrollHeight -
+    container.scrollTop -
+    container.clientHeight <
+    120;
+
+
+  container.innerHTML =
+    html.join("");
+
+
+  if (wasNearBottom) {
+
+    container.scrollTop =
+      container.scrollHeight;
+
+  }
+
+}
+
+
+/* SELECT PHOTO */
+
+function handleChatFileChange() {
+
+  const input =
+    document.getElementById(
+      "chatFile"
+    );
+
+  const file =
+    input.files &&
+    input.files[0];
+
+  if (!file) {
+
+    selectedChatFile = null;
+
+    return;
+  }
+
+
+  if (!file.type.startsWith("image/")) {
+
+    showToast(
+      "Wybierz zdjęcie."
+    );
+
+    input.value = "";
+
+    selectedChatFile = null;
+
+    return;
+  }
+
+
+  if (file.size > 8 * 1024 * 1024) {
+
+    showToast(
+      "Zdjęcie może mieć maksymalnie 8 MB."
+    );
+
+    input.value = "";
+
+    selectedChatFile = null;
+
+    return;
+  }
+
+
+  selectedChatFile = file;
+
+  showToast(
+    "Zdjęcie wybrane 📷"
+  );
+
+}
+
+
+/* SEND MESSAGE */
+
+async function sendChatMessage() {
+
+  if (
+    !currentUser ||
+    !currentChatUser
+  ) {
+    return;
+  }
+
+
+  const input =
+    document.getElementById(
+      "chatInput"
+    );
+
+  const body =
+    input.value.trim();
+
+
+  if (
+    !body &&
+    !selectedChatFile
+  ) {
+
+    return;
+
+  }
+
+
+  let imagePath = null;
+
+
+  /* UPLOAD PHOTO */
+
+  if (selectedChatFile) {
+
+    const file =
+      selectedChatFile;
+
+    const extension =
+      file.name
+        .split(".")
+        .pop()
+        .toLowerCase();
+
+
+    const path =
+      `${currentUser.id}/${crypto.randomUUID()}.${extension}`;
+
+
+    const {
+      error: uploadError
+    } =
+      await supabaseClient
+        .storage
+        .from("chat-images")
+        .upload(
+          path,
+          file,
+          {
+            contentType: file.type,
+            upsert: false
+          }
+        );
+
+
+    if (uploadError) {
+
+      console.error(
+        uploadError
+      );
+
+      showToast(
+        "Nie udało się wysłać zdjęcia."
+      );
+
+      return;
+    }
+
+
+    imagePath = path;
+
+  }
+
+
+  /* SAVE MESSAGE */
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("messages")
+      .insert({
+        from_user:
+          currentUser.id,
+
+        to_user:
+          currentChatUser.id,
+
+        body:
+          body || null,
+
+        image_path:
+          imagePath
+      });
+
+
+  if (error) {
+
+    console.error(
+      error
+    );
+
+    showToast(
+      "Nie udało się wysłać wiadomości."
+    );
+
+    return;
+
+  }
+
+
+  input.value = "";
+
+  document.getElementById(
+    "chatFile"
+  ).value = "";
+
+  selectedChatFile = null;
+
+
+  await loadChatMessages();
+
+}
 </script>
 
 </body>
